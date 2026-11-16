@@ -1,0 +1,3 @@
+dependency_overrides:
+  winche_core:
+    path: ../winche-core-dart-sdk
