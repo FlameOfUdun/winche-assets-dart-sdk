@@ -36,8 +36,8 @@ the app's folder (on the web they're kept in memory, and `file()` isn't availabl
 - **Reads** (`bytes`, `text`, `json`, `file`) use the release synced last. A file not on the device yet is downloaded
   once (however many ask at the same time), from the server's signed link without the user's token, and checked
   against its SHA-256 before it's kept. `isKept(path)` says whether a read works offline.
-- **What you may see** is the server's rules': the listing has only the files you may list, and reading one you may
-  not is `permissionDenied`. It's kept per user: signing in or out switches to that user's listing.
+- **What you may see** is the server's rules': the listing has only the files you may list (reading another path is
+  `notFound`), and one you may list but not read is `permissionDenied`. It's kept per user: signing in or out switches to that user's listing.
 - **What's kept**: each content once by hash (a file that didn't change between releases isn't downloaded again),
   up to `maxCacheBytes` (512 MB by default). Past it, contents no longer released go first, then the least recently
   used; prefetched files of the current release are always kept. `clearCache()` forgets everything.
