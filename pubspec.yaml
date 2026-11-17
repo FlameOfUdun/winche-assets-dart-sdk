@@ -1,6 +1,7 @@
 name: winche_assets
 description: Dart client for Winche Assets — an app's versioned content (translations, pages, media), synced from a channel and kept offline.
 version: 0.1.0
+homepage: https://github.com/FlameOfUdun/winche-assets-dart-sdk
 repository: https://github.com/FlameOfUdun/winche-assets-dart-sdk
 issue_tracker: https://github.com/FlameOfUdun/winche-assets-dart-sdk/issues
 
