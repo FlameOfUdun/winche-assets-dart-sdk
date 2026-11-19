@@ -9,7 +9,7 @@ import 'package:winche_core/winche_core.dart';
 
 /// Against a server (or `winche emulators start` with an assets folder) whose channel has `translations/*.json`
 /// readable by anyone: `WINCHE_ASSETS=http://localhost:9090 dart test --tags live` (WINCHE_ASSETS_CHANNEL, default
-/// production).
+/// production). WINCHE_ASSETS_CDN_FILE names a file of the channel kept on a CDN, to download it from there.
 void main() {
   final base = Platform.environment['WINCHE_ASSETS'];
   final channel = Platform.environment['WINCHE_ASSETS_CHANNEL'] ?? 'production';
@@ -31,4 +31,19 @@ void main() {
     await Winche.deinitializeAll();
     dir.deleteSync(recursive: true);
   }, skip: skip);
+
+  final cdnFile = Platform.environment['WINCHE_ASSETS_CDN_FILE'];
+  test('downloads a file kept on a CDN through the link the server gives, checked against its hash', () async {
+    final dir = Directory.systemTemp.createTempSync('winche-assets-live-');
+    final app = Winche.initializeApp(name: 'live-cdn', options: WincheOptions(baseUrl: Uri.parse(base!), directoryResolver: () async => dir.path));
+    final assets = WincheAssets.instanceFor(app)..settings = WincheAssetsSettings(channel: channel);
+    final release = await assets.sync();
+    final entry = release[cdnFile!]!;
+    expect(await assets.isKept(cdnFile), isFalse);
+    final kept = await assets.file(cdnFile);
+    expect(File(kept.localPath).lengthSync(), entry.size);
+    expect(await assets.isKept(cdnFile), isTrue);
+    await Winche.deinitializeAll();
+    dir.deleteSync(recursive: true);
+  }, skip: skip != false ? skip : cdnFile == null ? 'set WINCHE_ASSETS_CDN_FILE=<a path kept on a CDN>' : false, timeout: const Timeout(Duration(minutes: 5)));
 }
